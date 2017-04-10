@@ -4,7 +4,7 @@
 * Created By : Joao Filipe Romao                                       *
 * Create Date : 10/04/17                                               *
 * Description : Abap training - fetch data fron the a database         * 
-*               and present the data in a ALV                          *
+*               and present the data in an ALV                          *
 * CPR No. :                                                            *
 ************************************************************************
 * Modification history:                                                *
