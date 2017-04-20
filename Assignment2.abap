@@ -103,77 +103,80 @@ START-OF-SELECTION.
              ON EKKO~EBELN EQ EKPO~EBELN
              INTO TABLE it_joinned_table WHERE EKKO~BUKRS IN ls_cCode AND EKPO~AEDAT in ls_cDate AND EKPO~WERKS in ls_plant.
 
-
+*----------------------------------------------------------------------*
+*     if interior table is empty, output a message to the screen       *
+*----------------------------------------------------------------------*
       IF it_joinned_table[] IS INITIAL.
         WRITE: /'|     NO RECORDS TO SHOW!   |'.
       ELSE.
-
         LOOP AT it_joinned_table ASSIGNING <fs_ekko_ekpo>.
-          numIndex = numIndex + 1.
           IF lc_drec <> 'X'.
-            DELETE it_joinned_table WHERE lv_deleted_rec = 'L'.
-            num2 = num2 + 1.
+            DELETE it_joinned_table WHERE lv_deleted_rec = 'L'. " if the does not tick the "show deleted records" option
+                                                                " the system will deleted the deeted records from the iterior table.
           ENDIF.
 
           <fs_ekko_ekpo>-lv_total_sales = <fs_ekko_ekpo>-lv_net_price_doc * <fs_ekko_ekpo>-lv_pur_order_qty.   " calculate Total sales
         ENDLOOP.
 
-        wa_field-fieldname = 'LV_COM_CODE'.
-        wa_field-col_pos = 1.
-        wa_field-seltext_m = 'Company Code'(002).
+        wa_field-fieldname  = 'LV_COM_CODE'.
+        wa_field-col_pos    = 1.
+        wa_field-seltext_m  = 'Company Code'(002).
         APPEND wa_field to it_field.
 
-        wa_field-fieldname = 'LV_DOC_NUM'.
-        wa_field-col_pos = 2.
-        wa_field-seltext_m = 'Document Number'(012).
+        wa_field-fieldname  = 'LV_DOC_NUM'.
+        wa_field-col_pos    = 2.
+        wa_field-seltext_m  = 'Document Number'(012).
         APPEND wa_field to it_field.
 
-        wa_field-fieldname = 'LV_PUR_DOCUMENT'.
-        wa_field-col_pos = 3.
-        wa_field-seltext_m = 'Purchasing Document Type'(003).
+        wa_field-fieldname  = 'LV_PUR_DOCUMENT'.
+        wa_field-col_pos    = 3.
+        wa_field-seltext_m  = 'Purchasing Document Type'(003).
         APPEND wa_field to it_field.
 
-        wa_field-fieldname = 'LV_VENDOR_ACC'.
-        wa_field-col_pos = 4.
-        wa_field-seltext_m = 'Prod Vendor'(004).
+        wa_field-fieldname  = 'LV_VENDOR_ACC'.
+        wa_field-col_pos    = 4.
+        wa_field-seltext_m  = 'Prod Vendor'(004).
         APPEND wa_field to it_field.
 
-        wa_field-fieldname = 'LV_PLANT'.
-        wa_field-col_pos = 5.
-        wa_field-seltext_m = 'Plant'(005).
+        wa_field-fieldname  = 'LV_PLANT'.
+        wa_field-col_pos    = 5.
+        wa_field-seltext_m  = 'Plant'(005).
         APPEND wa_field to it_field.
 
-        wa_field-fieldname = 'LV_NET_PRICE_DOC'.
-        wa_field-col_pos = 6.
-        wa_field-seltext_m = 'Net Price in Purchasing Document'(006).
+        wa_field-fieldname  = 'LV_NET_PRICE_DOC'.
+        wa_field-col_pos    = 6.
+        wa_field-seltext_m  = 'Net Price in Purchasing Document'(006).
         APPEND wa_field to it_field.
 
-        wa_field-fieldname = 'LV_PUR_ORDER_QTY'.
-        wa_field-col_pos = 7.
-        wa_field-seltext_m = 'Order Qty'(007).
+        wa_field-fieldname  = 'LV_PUR_ORDER_QTY'.
+        wa_field-col_pos    = 7.
+        wa_field-seltext_m  = 'Order Qty'(007).
         APPEND wa_field to it_field.
 
-        wa_field-fieldname = 'LV_TOTAL_SALES'.
-        wa_field-col_pos = 8.
-        wa_field-seltext_m = 'Total Sale'(008).
+        wa_field-fieldname  = 'LV_TOTAL_SALES'.
+        wa_field-col_pos    = 8.
+        wa_field-seltext_m  = 'Total Sale'(008).
         APPEND wa_field to it_field.
 *----------------------------------------------------------------------*
 *      show deleted records column if the checkbox is selected         *
 *----------------------------------------------------------------------*
-        IF lc_drec = 'X'.
-          wa_field-fieldname = 'LV_DELETED_REC'.
-          wa_field-col_pos = 9.
-          wa_field-seltext_m = 'Delete Records'(011).
-          APPEND wa_field to it_field.
-        ENDIF.
+     IF lc_drec = 'X'.
+        wa_field-fieldname  = 'LV_DELETED_REC'.
+        wa_field-col_pos    = 9.
+        wa_field-seltext_m  = 'Delete Records'(011).
+        APPEND wa_field to it_field.
+     ENDIF.
 
         CALL FUNCTION 'REUSE_ALV_GRID_DISPLAY'
           EXPORTING
             IT_FIELDCAT = it_field
           TABLES
             T_OUTTAB    = it_joinned_table.
-
       ENDIF.
+*----------------------------------------------------------------------*
+*   if aan error is generated, catch the error and                     *
+*   output this error to the screen                                    *
+*----------------------------------------------------------------------*
     CATCH cx_root INTO oref.
       text = oref->get_text( ).
       WRITE: 'ERROR: ', text.
